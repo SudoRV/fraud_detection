@@ -19,7 +19,7 @@ export interface FraudStats {
   averageAmount: number;
   averageFraudAmount: number;
   scenarioBreakdown: {
-    scenario1: number; // Amount > 220
+    scenario1: number; // Amount > 2200
     scenario2: number; // Terminal fraud
     scenario3: number; // Customer fraud
   };
