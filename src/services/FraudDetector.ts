@@ -181,7 +181,7 @@ export class FraudDetector {
         verbose: 0,
         callbacks: {
           onEpochEnd: (epoch, logs) => {
-            if (epoch % 10 === 0) {
+            if (epoch % 1 === 0) {
               console.log(`Epoch ${epoch}: loss = ${logs?.loss?.toFixed(4)}, accuracy = ${logs?.acc?.toFixed(4)}`);
             }
           }
