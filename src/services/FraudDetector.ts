@@ -175,7 +175,7 @@ export class FraudDetector {
 
       // Train model
       await this.model.fit(X, y, {
-        epochs: 100,
+        epochs: 10,
         batchSize: 32,
         validationSplit: 0.2,
         verbose: 0,
