@@ -19,6 +19,7 @@ function App() {
   const [modelMetrics, setModelMetrics] = useState<ModelMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isTraining, setIsTraining] = useState(false);
+  const [isModelTrained, setIsModelTrained] = useState(false);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'training' | 'transactions' | 'predict'>('dashboard');
   const [fraudDetector] = useState(new FraudDetector());
 
@@ -51,6 +52,7 @@ function App() {
     try {
       const metrics = await fraudDetector.trainModel(transactions);
       setModelMetrics(metrics);
+      setIsModelTrained(true);
       
       // Get predictions and update transactions
       const predictedTransactions = await fraudDetector.predict(transactions);
@@ -81,6 +83,7 @@ function App() {
         confusion_matrix: [[0, 0], [0, 0]] // Placeholder
       };
       setModelMetrics(metrics);
+      setIsModelTrained(true);
       
       return predictedTransactions;
     } catch (error) {
@@ -94,8 +97,17 @@ function App() {
 
   const handleSinglePrediction = useCallback(async (transaction: any): Promise<{ isFraud: boolean; probability: number; scenario?: string }> => {
     try {
-      const predicted = await fraudDetector.predict([transaction]);
-      const result = predicted[0];
+      let result;
+      
+      if (isModelTrained) {
+        // Use trained neural network model
+        const predicted = await fraudDetector.predict([transaction]);
+        result = predicted[0];
+      } else {
+        // Fallback to rule-based detection
+        const predicted = fraudDetector.detectFraudRuleBased([transaction]);
+        result = predicted[0];
+      }
       
       let scenario = '';
       if (result.predicted_fraud === 1) {
@@ -115,7 +127,7 @@ function App() {
       console.error('Single prediction error:', error);
       throw error;
     }
-  }, [fraudDetector]);
+  }, [fraudDetector, isModelTrained]);
 
   const handleExportResults = useCallback(() => {
     if (transactions.length > 0) {
@@ -175,6 +187,7 @@ function App() {
                   setTransactions([]);
                   setFraudStats(null);
                   setModelMetrics(null);
+                  setIsModelTrained(false);
                   setTerminalStats([]);
                   setCustomerStats([]);
                 }}
@@ -215,7 +228,7 @@ function App() {
           <Dashboard
             fraudStats={fraudStats}
             modelMetrics={modelMetrics || undefined}
-            isModelTrained={!!modelMetrics}
+            isModelTrained={isModelTrained}
           />
         )}
 
@@ -233,7 +246,7 @@ function App() {
         {activeTab === 'predict' && (
           <PredictionForm
             onPredict={handleSinglePrediction}
-            isModelTrained={!!modelMetrics}
+            isModelTrained={isModelTrained}
           />
         )}
 

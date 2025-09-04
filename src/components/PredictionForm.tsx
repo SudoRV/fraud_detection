@@ -353,11 +353,11 @@ export const PredictionForm: React.FC<PredictionFormProps> = ({ onPredict, isMod
 
       {/* Model Status */}
       {!isModelTrained && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center">
-            <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
-            <span className="text-yellow-800">
-              No model trained yet. Please go to the Model Training tab to train a fraud detection model first.
+            <Shield className="w-5 h-5 text-blue-600 mr-2" />
+            <span className="text-blue-800">
+              No neural network model trained yet. Predictions will use rule-based detection. For better accuracy, train a model in the Model Training tab.
             </span>
           </div>
         </div>
