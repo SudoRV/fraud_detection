@@ -173,6 +173,8 @@ export class FraudDetector {
         metrics: ['accuracy']
       });
 
+      console.log()
+
       // Train model
       await this.model.fit(X, y, {
         epochs: 5,
