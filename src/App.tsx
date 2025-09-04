@@ -7,8 +7,9 @@ import { Dashboard } from './components/Dashboard';
 import { TransactionTable } from './components/TransactionTable';
 import { Analytics } from './components/Analytics';
 import { ModelTraining } from './components/ModelTraining';
+import { PredictionForm } from './components/PredictionForm';
 import { parseCSV, exportToCSV } from './utils/csvParser';
-import { Shield, BarChart3, Brain, Table } from 'lucide-react';
+import { Shield, BarChart3, Brain, Table, Calculator } from 'lucide-react';
 
 function App() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -18,7 +19,7 @@ function App() {
   const [modelMetrics, setModelMetrics] = useState<ModelMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isTraining, setIsTraining] = useState(false);
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'training' | 'transactions'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'training' | 'transactions' | 'predict'>('dashboard');
   const [fraudDetector] = useState(new FraudDetector());
 
   const handleFileLoad = useCallback(async (csvContent: string) => {
@@ -91,6 +92,31 @@ function App() {
     }
   }, [transactions, fraudDetector]);
 
+  const handleSinglePrediction = useCallback(async (transaction: any): Promise<{ isFraud: boolean; probability: number; scenario?: string }> => {
+    try {
+      const predicted = await fraudDetector.predict([transaction]);
+      const result = predicted[0];
+      
+      let scenario = '';
+      if (result.predicted_fraud === 1) {
+        if (transaction.TX_AMOUNT > 220) {
+          scenario = 'High Amount (Scenario 1)';
+        } else {
+          scenario = 'Pattern-based detection';
+        }
+      }
+      
+      return {
+        isFraud: result.predicted_fraud === 1,
+        probability: result.predicted_probability || 0,
+        scenario: scenario || undefined
+      };
+    } catch (error) {
+      console.error('Single prediction error:', error);
+      throw error;
+    }
+  }, [fraudDetector]);
+
   const handleExportResults = useCallback(() => {
     if (transactions.length > 0) {
       exportToCSV(transactions, `fraud_detection_results_${Date.now()}.csv`);
@@ -100,6 +126,7 @@ function App() {
   const tabs = [
     { id: 'dashboard' as const, label: 'Dashboard', icon: BarChart3 },
     { id: 'training' as const, label: 'Model Training', icon: Brain },
+    { id: 'predict' as const, label: 'Predict Transaction', icon: Calculator },
     { id: 'analytics' as const, label: 'Analytics', icon: BarChart3 },
     { id: 'transactions' as const, label: 'Transactions', icon: Table },
   ];
@@ -200,6 +227,13 @@ function App() {
             modelMetrics={modelMetrics || undefined}
             isTraining={isTraining}
             onExportResults={handleExportResults}
+          />
+        )}
+
+        {activeTab === 'predict' && (
+          <PredictionForm
+            onPredict={handleSinglePrediction}
+            isModelTrained={!!modelMetrics}
           />
         )}
 

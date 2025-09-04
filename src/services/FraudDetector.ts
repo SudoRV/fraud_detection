@@ -175,17 +175,11 @@ export class FraudDetector {
 
       // Train model
       await this.model.fit(X, y, {
-        epochs: 10,
+        epochs: 5,
         batchSize: 32,
         validationSplit: 0.2,
         verbose: 0,
-        callbacks: {
-          onEpochEnd: (epoch, logs) => {
-            if (epoch % 1 === 0) {
-              console.log(`Epoch ${epoch}: loss = ${logs?.loss?.toFixed(4)}, accuracy = ${logs?.acc?.toFixed(4)}`);
-            }
-          }
-        }
+        shuffle: true
       });
 
       // Calculate metrics
