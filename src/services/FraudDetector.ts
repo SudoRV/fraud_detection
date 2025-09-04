@@ -180,8 +180,16 @@ export class FraudDetector {
         epochs: 5,
         batchSize: 32,
         validationSplit: 0.2,
-        verbose: 0,
-        shuffle: true
+        shuffle: true,
+        callbacks: {
+          onEpochEnd: async (epoch, logs) => {
+            console.log(
+              `Epoch ${epoch + 1}: loss=${logs?.loss?.toFixed(4)}, ` +
+              `val_loss=${logs?.val_loss?.toFixed(4)}, ` +
+              `acc=${logs?.acc?.toFixed(4)}, val_acc=${logs?.val_acc?.toFixed(4)}`
+            );
+          }
+        }
       });
 
       // Calculate metrics
