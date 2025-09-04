@@ -166,6 +166,8 @@ export class FraudDetector {
         ]
       });
 
+      console.log("feature extraction completed");
+
       // Compile model
       this.model.compile({
         optimizer: tf.train.adam(0.001),
@@ -173,7 +175,7 @@ export class FraudDetector {
         metrics: ['accuracy']
       });
 
-      console.log()
+      console.log("begin to train the model");
 
       // Train model
       await this.model.fit(X, y, {
